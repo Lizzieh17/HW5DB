@@ -1,14 +1,15 @@
 import java.sql.*;
 import java.util.Scanner;
 
-
 class Room{
     Integer roomID, buildingID, numBeds;
     Boolean hasPrivateBaths, hasKitchen;
 }
 
 class Building{
-
+    Integer buildingID;
+    String name, address;
+    Boolean hasAC, hasDining;
 }
 
 class Student{
@@ -18,25 +19,22 @@ class Student{
 }
 
 class Assignment{
-
+    Integer studentID, buildingID, roomID;    
 }
 
 
-
-
-public class DormManagment {
+public class DormManagement {
     
     private Connection connection;
     private Statement statement;
     private static Scanner scan;
 
     //Public constructors 
-    public DormManagment(){
+    public DormManagement(){
         connection = null;
         statement = null;
         scan = new Scanner(System.in);
     }
-
 
     //General Database funcitons
     public void connect(String Username, String mysqlPassword) throws SQLException {
@@ -52,6 +50,12 @@ public class DormManagment {
     public void disConnect() throws SQLException {
         connection.close();
         statement.close();
+    }
+
+    public void initDatabase(String Username, String Password) throws SQLException {
+        connect(Username, Password);
+        // create a statement to hold mysql queries
+        statement = connection.createStatement();
     }
 
     public void query(String q) {
@@ -115,12 +119,6 @@ public class DormManagment {
         }
     }
 
-    public void initDatabase(String Username, String Password) throws SQLException {
-        connect(Username, Password);
-        // create a statement to hold mysql queries
-        statement = connection.createStatement();
-    }
-
 
     //Project functions
     
@@ -168,6 +166,45 @@ public class DormManagment {
     }
 
     public static void main(String[] args) throws SQLException{
+
+        String username = "lal013";
+        String password = "pass";
+
+        DormManagement dormManager = new DormManagement();
+        //dormManager.initDatabase(username, password);
+
+        Room room = new Room();
+        Building building = new Building();
+        Student student = new Student();
+        Assignment assignment = new Assignment();
+        
+
+        String choose = args[0]; 
+
+        if(choose.equals("addStudent")){
+            if (args.length != 7) {
+                System.err.println("Usage: java DormManagement <id> <name> <wantsAC> <wantsDining> <wantsKitchen> <wantsPrivateBath>");
+                return;
+            }
+            else{
+                try {
+                    student.studentID = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid string format. Cannot convert to integer.");
+                }
+                student.name = args[2];
+                student.wantsAC =  Boolean.parseBoolean(args[3]);
+                student.wantsDining = Boolean.parseBoolean(args[4]);
+                student.wantsKitchen = Boolean.parseBoolean(args[5]);
+                student.wantsKitchen = Boolean.parseBoolean(args[6]);
+            }
+            System.out.println(student.name + student.studentID + student.wantsAC + student.wantsDining + student.wantsKitchen + student.wantsPrivateBath);
+            //dormManager.addStudent(student);
+        }
+        else if(choose.equals("addAssignmet")){
+
+        }
+        
 
     }
 

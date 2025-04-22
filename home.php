@@ -2,53 +2,8 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="styles.css">
     <title>Home</title>
-    <style>
-        .form-container {
-            display: none;
-            margin-left: 20px;
-            margin-bottom: 20px;
-        }
-
-        html,
-        body {
-            height: 100%;
-        }
-
-        html {
-            display: table;
-            margin: auto;
-        }
-
-        body {
-            display: table-cell;
-            vertical-align: middle;
-        }
-
-        .block-container {
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .block-container:nth-child(odd) {
-            background-color: #e6f7ff;
-        }
-
-        .block-container:nth-child(even) {
-            background-color: #fffbe6;
-        }
-
-        .block-container button {
-            margin-top: 10px;
-        }
-    </style>
     <script>
         function toggleForm(id) {
             const form = document.getElementById(id);
@@ -66,16 +21,10 @@
     <ol>
         <div class="block-container">
             <li>Add a student</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form1')">Go</button>
-            </div>
-            <div id="form1" class="form-container">
-                <form method="post" action="add_student.php">
-                    Name: <input type="text" name="name"><br>
-                    ID: <input type="text" name="student_id"><br>
-                    <input type="submit" value="Add Student">
-                </form>
-            </div>
+            <button id="addStudentPage" class="op-button">Go to Add Student Page</button>
+            <script type="text/javascript">
+                document.getElementById("addStudentPage").onclick = function () { location.href = "add_student.php"; };
+            </script>
         </div>
 
         <div class="block-container">

@@ -1,6 +1,8 @@
 import java.sql.*;
 import java.util.Scanner;
 
+import javax.swing.text.View;
+
 
 
 public class DormManagment {
@@ -9,12 +11,15 @@ public class DormManagment {
     private Statement statement;
     private static Scanner scan;
 
+    //Public constructors 
     public DormManagment(){
         connection = null;
         statement = null;
         scan = new Scanner(System.in);
     }
 
+
+    //General Database funcitons
     public void connect(String Username, String mysqlPassword) throws SQLException {
         try {
             String url = "jdbc:mysql://localhost/" + Username + "?useSSL=false";
@@ -52,7 +57,6 @@ public class DormManagment {
         }
     }
 
-    
     public void printHeader(ResultSetMetaData metaData, int numColumns) throws SQLException {
         for (int i = 1; i <= numColumns; i++) {
             if (i > 1)
@@ -96,6 +100,48 @@ public class DormManagment {
         connect(Username, Password);
         // create a statement to hold mysql queries
         statement = connection.createStatement();
+    }
+
+
+    //Project functions
+    
+    // 1) Add a student to the Students table
+    // 2) Add an assignment to Assignment table. Check that the assignment meets the student's requirements.
+    // 3) View all the assignments in a building, i.e., which students are in which rooms, sorted by student Name.
+    // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
+    // 5) View all available rooms that meet a student's request, e.g., matches their desire for a private bathroom (or not), kitchen, etc.
+    // 6) View all students that could room with a given student (i.e., have the same requests)
+    // 7) View a report that lists, for each building, the number of total bedrooms, the number of total rooms, 
+    //    the number of rooms with some availability left, and the number of total bedrooms with some availability. 
+    //    at the bottom, create summary of number of total bedrooms available on campus.
+    // 8) BONUS: should require joining multiple tables and extending the schema to more attributes/tables
+
+    public void addStudent(){
+
+    }
+
+    public void addAssignement(){
+
+    }
+
+    public void viewAssignments(){
+
+    }
+
+    public void viewAvailableRooms(){
+
+    }
+
+    public void viewMatchingStudents(){
+
+    }
+
+    public void viewAllBuildings(){
+
+    }
+
+    public static void main(String[] args) throws SQLException{
+        
     }
 
 

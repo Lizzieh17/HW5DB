@@ -39,7 +39,7 @@ public class DormManagement {
     //General Database funcitons
     public void connect(String Username, String mysqlPassword) throws SQLException {
         try {
-            String url = "jdbc:mysql://localhost/" + Username + "?useSSL=false";
+            String url = "jdbc:mysql://localhost/" + Username + "?" + "user=" + Username + "&password=" + mysqlPassword + "&useSSL=false";
             System.out.println(url);
             connection = DriverManager.getConnection(url, Username, mysqlPassword);
         } catch (Exception e) {
@@ -134,8 +134,12 @@ public class DormManagement {
     // 8) BONUS: should require joining multiple tables and extending the schema to more attributes/tables
 
     public void addStudent(Student student){
+        // String q = "INSERT INTO Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)" +
+        //     "VALUES(" + student.studentID + ", '" + student.name + "', '" + student.wantsAC + "', '" + student.wantsDining + "', '" + student.wantsKitchen + "', '" +  student.wantsPrivateBath +  "')";
+            
+        // update(q);
         if(student.studentID == null || student.name.isEmpty() || student.wantsAC == null || student.wantsKitchen == null || student.wantsPrivateBath == null){
-           
+           System.out.println("nop");
         }
         else{
             String q = "INSERT INTO Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)" +
@@ -168,10 +172,17 @@ public class DormManagement {
     public static void main(String[] args) throws SQLException{
 
         String username = "lal013";
-        String password = "pass";
+        String password = "ooveiz0M";
 
-        DormManagement dormManager = new DormManagement();
-        //dormManager.initDatabase(username, password);
+        DormManagement dormManager = null;
+        try {
+            // Create a Bookstore instance and initialize the database
+            dormManager = new DormManagement();
+            dormManager.initDatabase(username, password);
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+            System.exit(1);
+        }
 
         Room room = new Room();
         Building building = new Building();
@@ -179,9 +190,9 @@ public class DormManagement {
         Assignment assignment = new Assignment();
         
 
-        String choose = args[0]; 
+        String actionPage = args[0]; 
 
-        if(choose.equals("addStudent")){
+        if(actionPage.equals("addStudent")){
             if (args.length != 7) {
                 System.err.println("Usage: java DormManagement <id> <name> <wantsAC> <wantsDining> <wantsKitchen> <wantsPrivateBath>");
                 return;
@@ -196,15 +207,23 @@ public class DormManagement {
                 student.wantsAC =  Boolean.parseBoolean(args[3]);
                 student.wantsDining = Boolean.parseBoolean(args[4]);
                 student.wantsKitchen = Boolean.parseBoolean(args[5]);
-                student.wantsKitchen = Boolean.parseBoolean(args[6]);
+                student.wantsPrivateBath = Boolean.parseBoolean(args[6]);
             }
             System.out.println(student.name + student.studentID + student.wantsAC + student.wantsDining + student.wantsKitchen + student.wantsPrivateBath);
-            //dormManager.addStudent(student);
+            dormManager.addStudent(student);
         }
-        else if(choose.equals("addAssignmet")){
+        else if(actionPage.equals("addAssignmet")){
 
         }
-        
+        else if(actionPage.equals("viewAssignments")){
+
+        }
+        else if(actionPage.equals("viewMatchingStudents")){
+
+        }
+        else if(actionPage.equals("viewAllBuildings")){
+
+        }
 
     }
 

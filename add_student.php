@@ -28,6 +28,7 @@
 <?php
 if(isset($_POST['submit'])){
 
+    $actionPage = "addStudent";
     $studentID = $_POST['studentID'] ?? '';
     $name = $_POST['name'] ?? '';
     $wantsAC = isset($_POST['wantsAC']) ? 'true' : 'false';
@@ -36,8 +37,8 @@ if(isset($_POST['submit'])){
     $wantsPrivateBath = isset($_POST['wantsPrivateBath']) ? 'true' : 'false';
 
     //$jsonStudent = escapeshellarg(json_encode($student));
-    $command = "java DormManagement " . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  escapeshellarg($wantsAC) . ' ' . 
-                escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsPrivateBath);
+    $command = "java DormManagement " . escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  escapeshellarg($wantsAC) . ' ' . 
+                escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsPrivateBath);
 
     $command = escapeshellcmd($command);
 

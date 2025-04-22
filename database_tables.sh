@@ -19,7 +19,7 @@ CREATE TABLE Room(
     roomID INT PRIMARY KEY,
     buildingID INT NOT NULL,
     numBeds INT NOT NULL,
-    privateBaths BOOLEAN NOT NULL,
+    hasPrivateBaths BOOLEAN NOT NULL,
     hasKitchen BOOLEAN NOT NULL,
     FOREIGN KEY (buildingID) REFERENCES Building(buildingID) ON DELETE CASCADE
 );
@@ -50,7 +50,7 @@ VALUES
     (2, 'Oak Tower', '200 College Blvd', FALSE, TRUE),
     (3, 'Pine Residence', '150 Campus Drive', TRUE, FALSE);
 
-INSERT INTO Room (roomID, buildingID, numBeds, privateBaths, hasKitchen)
+INSERT INTO Room (roomID, buildingID, numBeds, hasPrivateBaths, hasKitchen)
 VALUES  
     -- Maple Hall (AC + Dining)
     (101, 1, 2, FALSE, TRUE),   -- Shared bath, kitchen

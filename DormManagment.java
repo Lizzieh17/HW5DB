@@ -1,7 +1,26 @@
 import java.sql.*;
 import java.util.Scanner;
 
-import javax.swing.text.View;
+
+class Room{
+    Integer roomID, buildingID, numBeds;
+    Boolean hasPrivateBaths, hasKitchen;
+}
+
+class Building{
+
+}
+
+class Student{
+    Integer studentID; 
+    String name;
+    Boolean wantsAC, wantsDining, wantsKitchen, wantsPrivateBath;
+}
+
+class Assignment{
+
+}
+
 
 
 
@@ -116,8 +135,16 @@ public class DormManagment {
     //    at the bottom, create summary of number of total bedrooms available on campus.
     // 8) BONUS: should require joining multiple tables and extending the schema to more attributes/tables
 
-    public void addStudent(){
-
+    public void addStudent(Student student){
+        if(student.studentID == null || student.name.isEmpty() || student.wantsAC == null || student.wantsKitchen == null || student.wantsPrivateBath == null){
+           
+        }
+        else{
+            String q = "INSERT INTO Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)" +
+            "VALUES(" + student.studentID + ", '" + student.name + "', '" + student.wantsAC + "', '" + student.wantsDining + "', '" + student.wantsKitchen + "', '" +  student.wantsPrivateBath +  "')";
+            
+            update(q);
+        }
     }
 
     public void addAssignement(){
@@ -141,7 +168,7 @@ public class DormManagment {
     }
 
     public static void main(String[] args) throws SQLException{
-        
+
     }
 
 

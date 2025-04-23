@@ -1,5 +1,4 @@
 import java.sql.*;
-import java.util.Scanner;
 
 class Room{
     Integer roomID, buildingID, numBeds;
@@ -22,104 +21,12 @@ class Assignment{
     Integer studentID, buildingID, roomID;    
 }
 
-
 public class DormManagement {
-    
-    private Connection connection;
-    private Statement statement;
-    private static Scanner scan;
 
     //Public constructors 
+
     public DormManagement(){
-        connection = null;
-        statement = null;
-        scan = new Scanner(System.in);
     }
-
-    //General Database funcitons
-    public void connect(String Username, String mysqlPassword) throws SQLException {
-        try {
-            String url = "jdbc:mysql://localhost/" + Username + "?" + "user=" + Username + "&password=" + mysqlPassword + "&useSSL=false";
-            System.out.println(url);
-            connection = DriverManager.getConnection(url, Username, mysqlPassword);
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
-    public void disConnect() throws SQLException {
-        connection.close();
-        statement.close();
-    }
-
-    public void initDatabase(String Username, String Password) throws SQLException {
-        connect(Username, Password);
-        // create a statement to hold mysql queries
-        statement = connection.createStatement();
-    }
-
-    public void query(String q) {
-        try {
-            ResultSet resultSet = statement.executeQuery(q);
-            System.out.println("---------------------------------");
-            System.out.println("Query: \n" + q + "\n\nResult: ");
-            print(resultSet);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void update(String q) {
-        try {
-            int result = statement.executeUpdate(q);
-            System.out.println("---------------------------------");
-            System.out.println("Query: \n" + q + "\n\nResult: ");
-            System.out.println(result + " rows were affected");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void printHeader(ResultSetMetaData metaData, int numColumns) throws SQLException {
-        for (int i = 1; i <= numColumns; i++) {
-            if (i > 1)
-                System.out.print(",  ");
-            System.out.print(metaData.getColumnName(i));
-        }
-        System.out.println();
-    }
-
-    public void printRecords(ResultSet resultSet, int numColumns) throws SQLException {
-        String columnValue;
-        while (resultSet.next()) {
-            for (int i = 1; i <= numColumns; i++) {
-                if (i > 1)
-                    System.out.print(",  ");
-                columnValue = resultSet.getString(i);
-                System.out.print(columnValue);
-            }
-            System.out.println("");
-        }
-    }
-
-    public void print(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        int numColumns = metaData.getColumnCount();
-
-        printHeader(metaData, numColumns);
-        printRecords(resultSet, numColumns);
-    }
-
-    public void insert(String table, String values) {
-        String q = "INSERT into " + table + " values (" + values + ")";
-        try {
-            statement.executeUpdate(q);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     //Project functions
     
     // 1) Add a student to the Students table
@@ -133,24 +40,25 @@ public class DormManagement {
     //    at the bottom, create summary of number of total bedrooms available on campus.
     // 8) BONUS: should require joining multiple tables and extending the schema to more attributes/tables
 
-    public void addStudent(Student student){
-        // String q = "INSERT INTO Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)" +
-        //     "VALUES(" + student.studentID + ", '" + student.name + "', '" + student.wantsAC + "', '" + student.wantsDining + "', '" + student.wantsKitchen + "', '" +  student.wantsPrivateBath +  "')";
-            
-        // update(q);
+    public void addStudent(Student student, jdbc_db database){
         if(student.studentID == null || student.name.isEmpty() || student.wantsAC == null || student.wantsKitchen == null || student.wantsPrivateBath == null){
            System.out.println("nop");
         }
         else{
-            String q = "INSERT INTO Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)" +
-            "VALUES(" + student.studentID + ", '" + student.name + "', '" + student.wantsAC + "', '" + student.wantsDining + "', '" + student.wantsKitchen + "', '" +  student.wantsPrivateBath +  "')";
-            
-            update(q);
+            //booleans might be messing up
+            String input = student.studentID + ", '" + student.name + "', " + student.wantsAC + ", " + student.wantsDining + ", " + student.wantsKitchen + ", " +  student.wantsPrivateBath +  ")";
+            database.insert("Student", input);
         }
     }
-
-    public void addAssignement(){
-
+    
+    public void addAssignement(Assignment assignment, jdbc_db database){
+        if(assignment.studentID == null || assignment.buildingID == null || assignment.roomID == null){
+            System.out.println("nop");
+         }
+         else{
+             String input = assignment.studentID + ", '" + assignment.buildingID + "', '" + assignment.roomID  +  "')";
+             database.insert("Assignment", input);
+         }
     }
 
     public void viewAssignments(){
@@ -173,16 +81,12 @@ public class DormManagement {
 
         String username = "lal013";
         String password = "ooveiz0M";
+        DormManagement dormManager = new DormManagement();
 
-        DormManagement dormManager = null;
-        try {
-            // Create a Bookstore instance and initialize the database
-            dormManager = new DormManagement();
-            dormManager.initDatabase(username, password);
-        } catch (SQLException e) {
-            System.out.println("Error connecting to the database: " + e.getMessage());
-            System.exit(1);
-        }
+        jdbc_db database = new jdbc_db();
+        database.connect(username, password);
+        database.initDatabase();
+   
 
         Room room = new Room();
         Building building = new Building();
@@ -210,7 +114,7 @@ public class DormManagement {
                 student.wantsPrivateBath = Boolean.parseBoolean(args[6]);
             }
             System.out.println(student.name + student.studentID + student.wantsAC + student.wantsDining + student.wantsKitchen + student.wantsPrivateBath);
-            dormManager.addStudent(student);
+            dormManager.addStudent(student, database);
         }
         else if(actionPage.equals("addAssignmet")){
 
@@ -224,6 +128,8 @@ public class DormManagement {
         else if(actionPage.equals("viewAllBuildings")){
 
         }
+
+        database.disConnect();
 
     }
 

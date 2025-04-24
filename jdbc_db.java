@@ -4,8 +4,8 @@ import java.sql.*;
 public class jdbc_db {
 
    // The instance variables for the class
-   private Connection connection;
-   private Statement statement;
+   public Connection connection;
+   public Statement statement;
 
    // The constructor for the class
    public jdbc_db() {

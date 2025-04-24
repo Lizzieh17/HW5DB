@@ -118,3 +118,32 @@ footer {
 .toast-top.show {
     display: block;
 }
+
+.results-container {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.results-table th, .results-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.results-table th {
+    background-color: #f2f2f2;
+}
+
+.no-results {
+    color: #666;
+    font-style: italic;
+    margin: 20px;
+}

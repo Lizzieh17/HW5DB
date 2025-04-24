@@ -1,29 +1,47 @@
-<?php
-// $name = $_POST['name'] ?? '';
-// $student_id = $_POST['student_id'] ?? '';
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css">
+        <title>Add a student</title>
+    </head>
 
-// echo "<h2>Student Added</h2>";
-// echo "Name: " . htmlspecialchars($name) . "<br>";
-// echo "Student ID: " . htmlspecialchars($student_id);
-?>
-
-<!-- <html>
-<head>
-    <link rel="stylesheet" href="styles.css">
-</head>
-
-    <div>
-        <div class="block-container">
-            <li>Add a student</li>
-            <div id="form1" class="form-container">
-                <form method="post" action="add_student.php">
-                    Name: <input type="text" name="name"><br>
-                    ID: <input type="text" name="student_id"><br>
-                    <input type="submit" value="Add Student">
-                </form>
+    <body>
+        <div>
+            <div class="block-container">
+                <div id="form1" class="form-container">
+                    <form method="post" action="add_student.php">
+                        ID: <input type="text" name="studentID"><br>
+                        Name: <input type="text" name="name"><br>
+                        WantsAC: <input type="checkbox" name="wantsAC" value="true"><br>
+                        WantsDining: <input type="checkbox" name="wantsDining" value="true"><br>
+                        WantsKitchen: <input type="checkbox" name="wantsKitchen" value="true"><br>
+                        WantsPrivateBath: <input type="checkbox" name="wantsPrivateBath" value="true"><br>
+                        <input type="submit" name='submit' value="Add Student">
+                    </form>
+                </div>
             </div>
+
+            <a href="home.php">Back to Home</a> 
         </div>
-    
-        <a href="home.php">Back to Home</a> 
-    </div>
-</html> -->
+    </body> 
+</html>
+
+<?php
+if(isset($_POST['submit'])){
+
+    $actionPage = "addStudent";
+    $studentID = $_POST['studentID'] ?? '';
+    $name = $_POST['name'] ?? '';
+    $wantsAC = isset($_POST['wantsAC']) ? 'true' : 'false';
+    $wantsDining = isset($_POST['wantsDining']) ? 'true' : 'false';
+    $wantsKitchen = isset($_POST['wantsKitchen']) ? 'true' : 'false';
+    $wantsPrivateBath = isset($_POST['wantsPrivateBath']) ? 'true' : 'false';
+
+    //$jsonStudent = escapeshellarg(json_encode($student));
+    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' . 
+                escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  
+                escapeshellarg($wantsAC) . ' ' . escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsPrivateBath);
+
+    $command = escapeshellcmd($command);
+    system($command); 
+} 
+?>

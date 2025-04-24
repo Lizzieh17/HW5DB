@@ -109,7 +109,9 @@ public class jdbc_db {
          statement.executeUpdate(query);
          System.out.println("inserted");
       } catch (SQLException e) {
-         System.out.println("not inserted");
+         System.out.println("ERROR: not inserted");
+         System.out.println("ERROR: Query: " + query);
+         System.out.println("ERROR:" + e);
          e.printStackTrace();
       }
    }
@@ -122,12 +124,12 @@ public class jdbc_db {
 
          try {
             statement.executeUpdate(query);
-            System.out.println("Table '" + tableName + "' created successfully.");
+            System.out.println("ERROR: Table '" + tableName + "' created successfully.");
          } catch (SQLException e) {
             e.printStackTrace();
          }
       } else {
-         System.out.println("Table '" + tableName + "' already exists.");
+         System.out.println("ERROR: Table '" + tableName + "' already exists.");
       }
    }
 
@@ -144,6 +146,72 @@ public class jdbc_db {
       }
       return false; // Table does not exist
    }
+
+   public boolean studentExists(int studentID) {
+      String q = "SELECT COUNT(*) FROM Student WHERE studentID = " + studentID + ";";
+      try {
+         ResultSet resultSet = statement.executeQuery(q);
+         if (resultSet.next()) {
+            return resultSet.getInt(1) > 0;
+         } else {
+            System.out.println("ERROR: Couldn't find student");
+            return false;
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+         System.out.println("ERROR: Couldn't find student");
+         return false;
+      }
+   }
+   public boolean buildingExists(int buildingID) {
+      String q = "SELECT COUNT(*) FROM Building WHERE buildingID = " + buildingID + ";";
+      try {
+         ResultSet resultSet = statement.executeQuery(q);
+         if (resultSet.next()) {
+            return resultSet.getInt(1) > 0;
+         } else {
+            System.out.println("ERROR: Couldn't find building");
+            return false;
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+         System.out.println("ERROR: Couldn't find building");
+         return false;
+      }
+   }
+   public boolean roomExists(int roomID) {
+      String q = "SELECT COUNT(*) FROM Room WHERE roomID = " + roomID + ";";
+      try {
+         ResultSet resultSet = statement.executeQuery(q);
+         if (resultSet.next()) {
+            return resultSet.getInt(1) > 0;
+         } else {
+            System.out.println("ERROR: Couldn't find room");
+            return false;
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+         System.out.println("ERROR: Couldn't find room");
+         return false;
+      }
+   }
+
+   // public boolean roomFull(int roomID) {
+   //    String q = "SELECT COUNT(*) FROM Assignment WHERE roomID = " + roomID + ";";
+   //    try {
+   //       ResultSet resultSet = statement.executeQuery(q);
+   //       if (resultSet.next()) {
+   //          return resultSet.getInt(1) > 0;
+   //       } else {
+   //          System.out.println("Couldn't find room");
+   //          return false;
+   //       }
+   //    } catch (SQLException e) {
+   //       e.printStackTrace();
+   //       System.out.println("Couldn't find room");
+   //       return false;
+   //    }
+   // }
 
    // Remove all records and fill them with values for testing
    // Assumes that the tables are already created

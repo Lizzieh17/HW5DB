@@ -21,86 +21,58 @@
     <ol>
         <div class="block-container">
             <li>Add a student</li>
-            <button id="addStudentPage" class="op-button">Go to Add Student Page</button>
+            <button id="addStudentPage" class="op-button">Go</button>
             <script type="text/javascript">
                 document.getElementById("addStudentPage").onclick = function () { location.href = "add_student.php"; };
             </script>
         </div>
 
         <div class="block-container">
-            <li>Add an assignment</li>
-            <div>
-                <button onclick="toggleForm('form2')">Go</button>
-            </div>
-            <div id="form2" class="form-container">
-                <form method="post" action="add_assignment.php">
-                    Title: <input type="text" name="title"><br>
-                    Due Date: <input type="date" name="due_date"><br>
-                    <input type="submit" value="Add Assignment">
-                </form>
-            </div>
+            <li>Add an Assignment</li>
+            <button id="addAssignmentPage" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("addAssignmentPage").onclick = function () { location.href = "add_assignment.php"; };
+            </script>
         </div>
 
         <div class="block-container">
             <li>View all the assignments in a building</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form3')">Go</button>
-            </div>
-            <div id="form3" class="form-container">
-                <form method="get" action="view_assignments.php">
-                    Building Name: <input type="text" name="building"><br>
-                    <input type="submit" value="View Assignments">
-                </form>
-            </div>
+            <button id="viewAssignments" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("viewAssignments").onclick = function () { location.href = "view_assignments.php"; };
+            </script>
         </div>
 
         <div class="block-container">
             <li>View all the rooms</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form4')">Go</button>
-            </div>
-            <div id="form4" class="form-container">
-                <form method="get" action="view_rooms.php">
-                    <input type="submit" value="View Rooms">
-                </form>
-            </div>
+            <button id="viewRooms" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("viewRooms").onclick = function () { location.href = "view_rooms.php"; };
+            </script>
         </div>
 
         <div class="block-container">
             <li>View all available rooms</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form5')">Go</button>
-            </div>
-            <div id="form5" class="form-container">
-                <form method="get" action="view_available_rooms.php">
-                    <input type="submit" value="View Available Rooms">
-                </form>
-            </div>
+            <button id="viewAvailableRooms" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("viewAvailableRooms").onclick = function () { location.href = "view_available_rooms.php"; };
+            </script>
         </div>
 
         <div class="block-container">
             <li>View all students that could room with a given student</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form6')">Go</button>
-            </div>
-            <div id="form6" class="form-container">
-                <form method="get" action="possible_roommates.php">
-                    Student ID: <input type="text" name="student_id"><br>
-                    <input type="submit" value="Find Roommates">
-                </form>
-            </div>
+            <button id="viewMatchingStudents" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("viewMatchingStudents").onclick = function () { location.href = "matching_students.php"; };
+            </script>
         </div>
 
         <div class="block-container">
             <li>View a report</li>
-            <div>
-                <button class="op-button" onclick="toggleForm('form7')">Go</button>
-            </div>
-            <div id="form7" class="form-container">
-                <form method="get" action="view_report.php">
-                    <input type="submit" value="View Report">
-                </form>
-            </div>
+            <button id="viewReport" class="op-button">Go</button>
+            <script type="text/javascript">
+                document.getElementById("viewReport").onclick = function () { location.href = "view_report.php"; };
+            </script>
         </div>
     </ol>
 </body>

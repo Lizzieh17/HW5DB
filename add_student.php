@@ -1,33 +1,46 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="styles.css">
-        <title>Add a student</title>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add a Student</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Add a Student</h1>
+    </header>
 
-    <body>
-        <div>
-            <div class="block-container">
-                <div id="form1" class="form-container">
-                    <form method="post" action="add_student.php">
-                        ID: <input type="text" name="studentID"><br>
-                        Name: <input type="text" name="name"><br>
-                        WantsAC: <input type="checkbox" name="wantsAC" value="true"><br>
-                        WantsDining: <input type="checkbox" name="wantsDining" value="true"><br>
-                        WantsKitchen: <input type="checkbox" name="wantsKitchen" value="true"><br>
-                        WantsPrivateBath: <input type="checkbox" name="wantsPrivateBath" value="true"><br>
-                        <input type="submit" name='submit' value="Add Student">
-                    </form>
-                </div>
+    <main class="container">
+        <div class="panel" style="max-width: 500px; width: 100%;">
+            <form method="post" action="add_student.php" class="styled-form">
+                <label for="studentID">ID:</label>
+                <input type="text" name="studentID" id="studentID" required>
+
+                <label for="name">Name:</label>
+                <input type="text" name="name" id="name" required>
+
+                <label><input type="checkbox" name="wantsAC" value="true"> Wants AC</label>
+                <label><input type="checkbox" name="wantsDining" value="true"> Wants Dining</label>
+                <label><input type="checkbox" name="wantsKitchen" value="true"> Wants Kitchen</label>
+                <label><input type="checkbox" name="wantsPrivateBath" value="true"> Wants Private Bath</label>
+
+                <input type="submit" name="submit" value="Add Student" class="op-button">
+            </form>
+
+            <div style="margin-top: 1rem;">
+                <a href="home.php" class="op-button" style="text-decoration: none;">Back to Home</a>
             </div>
-
-            <a href="home.php">Back to Home</a> 
         </div>
-    </body> 
+    </main>
+
+    <footer>
+        <p>Created by Luke Lyons and Lizzie Howell</p>
+    </footer>
+</body>
 </html>
 
 <?php
-if(isset($_POST['submit'])){
-
+if (isset($_POST['submit'])) {
     $actionPage = "addStudent";
     $studentID = $_POST['studentID'] ?? '';
     $name = $_POST['name'] ?? '';
@@ -36,21 +49,11 @@ if(isset($_POST['submit'])){
     $wantsKitchen = isset($_POST['wantsKitchen']) ? 'true' : 'false';
     $wantsPrivateBath = isset($_POST['wantsPrivateBath']) ? 'true' : 'false';
 
-    //$jsonStudent = escapeshellarg(json_encode($student));
-    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' . 
-                escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  
+    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' .
+                escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .
                 escapeshellarg($wantsAC) . ' ' . escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsPrivateBath);
 
     $command = escapeshellcmd($command);
-
-    echo "<h2>Student to be added: </h2>";
-    echo "Student ID: " . htmlspecialchars($studentID) . "<br>";
-    echo "Name: " . htmlspecialchars($name) . "<br>";
-    echo "Wants AC: " . htmlspecialchars($wantsAC) . "<br>";
-    echo "Wants Dining: " . htmlspecialchars($wantsDining) . "<br>";
-    echo "Wants Kitchen: " . htmlspecialchars($wantsKitchen) . "<br>";
-    echo "Wants Private Bath: " . htmlspecialchars($wantsPrivateBath) . "<br>";
-    echo "command: $command <br>";
     system($command); 
     
     

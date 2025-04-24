@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e -v
-# echo "Creating and filling tables from HW3 solution..."
-# bash ./hw3_soln.sh
+
+echo "Deleting all .class files in this directory and subdirectories..."
+find . -name "*.class" -type f -delete
+echo "Cleanup complete!"
 
 echo "Compiling..."
 javac *.java

@@ -104,45 +104,46 @@ public class jdbc_db {
 
    // Insert into any table, any values from data passed in as String parameters
    public void insert(String table, String values) {
-      String query = "INSERT into " + table + " values (" + values + ")";
-
+      String query = "INSERT INTO " + table + " VALUES (" + values + ")";
       try {
          statement.executeUpdate(query);
+         System.out.println("inserted");
       } catch (SQLException e) {
+         System.out.println("not inserted");
          e.printStackTrace();
       }
    }
-      // Create a table only if it doesn't already exist
-   public void createTable(String tableName, String columns) {
-       // Check if the table already exists
-       if (!tableExists(tableName)) {
-           String query = "CREATE TABLE " + tableName + " (" + columns + ")";
 
-           try {
-               statement.executeUpdate(query);
-               System.out.println("Table '" + tableName + "' created successfully.");
-           } catch (SQLException e) {
-               e.printStackTrace();
-           }
-       } else {
-           System.out.println("Table '" + tableName + "' already exists.");
-       }
+   // Create a table only if it doesn't already exist
+   public void createTable(String tableName, String columns) {
+      // Check if the table already exists
+      if (!tableExists(tableName)) {
+         String query = "CREATE TABLE " + tableName + " (" + columns + ")";
+
+         try {
+            statement.executeUpdate(query);
+            System.out.println("Table '" + tableName + "' created successfully.");
+         } catch (SQLException e) {
+            e.printStackTrace();
+         }
+      } else {
+         System.out.println("Table '" + tableName + "' already exists.");
+      }
    }
 
    // Helper method to check if a table exists
    private boolean tableExists(String tableName) {
-       try {
-           DatabaseMetaData dbm = connection.getMetaData();
-           ResultSet tables = dbm.getTables(null, null, tableName, null);
-           if (tables.next()) {
-               return true; // Table exists
-           }
-       } catch (SQLException e) {
-           e.printStackTrace();
-       }
-       return false; // Table does not exist
+      try {
+         DatabaseMetaData dbm = connection.getMetaData();
+         ResultSet tables = dbm.getTables(null, null, tableName, null);
+         if (tables.next()) {
+            return true; // Table exists
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+      return false; // Table does not exist
    }
-
 
    // Remove all records and fill them with values for testing
    // Assumes that the tables are already created

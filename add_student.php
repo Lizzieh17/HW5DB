@@ -37,13 +37,13 @@ if(isset($_POST['submit'])){
     $wantsPrivateBath = isset($_POST['wantsPrivateBath']) ? 'true' : 'false';
 
     //$jsonStudent = escapeshellarg(json_encode($student));
-    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement' . 
+    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' . 
                 escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  
                 escapeshellarg($wantsAC) . ' ' . escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsPrivateBath);
 
     $command = escapeshellcmd($command);
 
-    echo "<h2>Student Added</h2>";
+    echo "<h2>Student to be added: </h2>";
     echo "Student ID: " . htmlspecialchars($studentID) . "<br>";
     echo "Name: " . htmlspecialchars($name) . "<br>";
     echo "Wants AC: " . htmlspecialchars($wantsAC) . "<br>";
@@ -52,5 +52,7 @@ if(isset($_POST['submit'])){
     echo "Wants Private Bath: " . htmlspecialchars($wantsPrivateBath) . "<br>";
     echo "command: $command <br>";
     system($command); 
+    
+    
 } 
 ?>

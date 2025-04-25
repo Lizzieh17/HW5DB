@@ -30,17 +30,8 @@ public class DormManagement {
     }
     // Project functions
 
-    // 1) Add a student to the Students table
-    // 2) Add an assignment to Assignment table. Check that the assignment meets the student's requirements.
-    // 3) View all the assignments in a building, i.e., which students are in which rooms, sorted by student Name.
-    // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
-    // 5) View all available rooms that meet a student's request, e.g., matches their desire for a private bathroom (or not), kitchen, etc.
-    // 6) View all students that could room with a given student (i.e., have the same requests)
-    // 7) View a report that lists, for each building, the number of total bedrooms, 
-    //    the number of total rooms, the number of rooms with some availability left, 
-    //    and the number of total bedrooms with some availability. At the bottom, 
-    //    create summary of number of total bedrooms available on campus.
 
+    // 1) Add a student to the Students table
     public void addStudent(Student student, jdbc_db database) {
         System.out.println("Hello from add");
         if (student.studentID == null || student.name.isEmpty() || student.wantsAC == null
@@ -52,7 +43,8 @@ public class DormManagement {
             database.insert("Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)", input);
         }
     }
-
+    
+    // 2) Add an assignment to Assignment table. Check that the assignment meets the student's requirements.
     public void addAssignement(Assignment assignment, jdbc_db database) {
         if (assignment.studentID == null || assignment.buildingID == null || assignment.roomID == null) {
             System.out.println("ERROR: nop at assignment");
@@ -62,8 +54,9 @@ public class DormManagement {
         }
     }
 
+    //building name grab not working will fix later
+    // 3) View all the assignments in a building, i.e., which students are in which rooms, sorted by student Name.
     public void viewAssignments(jdbc_db database, int buildingId) throws SQLException {
-        StringBuilder buildingNameResult = new StringBuilder();
         StringBuilder assignmentResult = new StringBuilder();
 
         String buildingName = "Couldn't find building";
@@ -79,8 +72,8 @@ public class DormManagement {
                 buildingName = resultSet1.getString("buildingName");
             }
 
-            if(buildingNameResult.length() == 0 ){
-                buildingNameResult.append("ERROR: Coulnd't find building");
+            if(buildingName.equals("Couldn't find building")){
+                System.out.println("ERROR: Coulnd't find building");
                 return;
             }
         } catch (SQLException e){
@@ -106,18 +99,80 @@ public class DormManagement {
         System.out.println(assignmentResult.toString());
     }
 
+    // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
     public void viewAvailableRooms() {
 
     }
 
-    public void viewMatchingRooms() {
+    // 5) View all available rooms that meet a student's request, e.g., matches their desire for a private bathroom (or not), kitchen, etc.
+    public void viewMatchingRooms(int studentID, jdbc_db database) {
+        StringBuilder matchingRooms = new StringBuilder();
+        Boolean wantsAC = false, wantsDining = false, wantsKitchen = false, wantsPrivateBath = false;
 
+        String q1 = "SELECT Student.wantsAC, Student.wantsDining, Student.wantsKitchen, Student.wantsPrivateBath " +
+                   "FROM Student WHERE Student.studentID = " + studentID;
+        try{
+            ResultSet resultSet1 = database.statement.executeQuery(q1);
+            if(resultSet1.next()){
+                wantsAC = resultSet1.getBoolean("wantsAC");
+                wantsDining = resultSet1.getBoolean("wantsDining");
+                wantsKitchen = resultSet1.getBoolean("wantsKitchen"); 
+                wantsPrivateBath = resultSet1.getBoolean("wantsPrivateBath");
+            }
+            else{
+                System.out.println("ERROR: Coulnd't find student");
+                return;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }        
+
+        String q2 = "SELECT Building.buildingID, Building.name AS buildingName, Building.hasAC, Building.hasDining, " + 
+                    "Room.roomID, Room.hasKitchen, Room.hasPrivateBaths FROM Room " +
+                    "JOIN Building ON Room.buildingID = Building.buildingID " + 
+                    "WHERE Building.hasAC = " + wantsAC.toString() + " AND Building.hasDining = " + wantsDining.toString() + 
+                    " AND Room.hasKitchen = " + wantsKitchen.toString() + " AND Room.hasPrivateBaths = " + wantsPrivateBath.toString();
+        //System.out.println(q2);
+        try{
+            ResultSet resultSet2 = database.statement.executeQuery(q2);
+            while(resultSet2.next()){
+                
+                int buildingID = resultSet2.getInt("buildingID");
+                String buildingName = resultSet2.getString("buildingName");
+                boolean buildingHasAC  = resultSet2.getBoolean("hasAC");
+                boolean buildingHasDining = resultSet2.getBoolean("hasDining");
+                int roomID = resultSet2.getInt("roomID");
+                boolean roomHasKitchen = resultSet2.getBoolean("hasKitchen");
+                boolean roomHasPrivateBaths = resultSet2.getBoolean("hasPrivateBaths");
+                matchingRooms.append(buildingID).append(" | ")
+                             .append(buildingName).append(" | ")
+                             .append(buildingHasAC).append(" | ")
+                             .append(buildingHasDining).append(" | ")  
+                             .append(roomID).append(" | ")
+                             .append(roomHasKitchen).append(" | ")
+                             .append(roomHasPrivateBaths).append("\n");
+
+            }
+
+            if(matchingRooms.length() == 0 ){
+                matchingRooms.append("ERROR: Coulnd't find any rooms");
+                return;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        System.out.println(matchingRooms.toString());
     }
 
+    // 6) View all students that could room with a given student (i.e., have the same requests)
     public void viewMatchingStudents() {
-
+ 
     }
 
+    // 7) View a report that lists, for each building, the number of total bedrooms, 
+    //    the number of total rooms, the number of rooms with some availability left, 
+    //    and the number of total bedrooms with some availability. At the bottom, 
+    //    create summary of number of total bedrooms available on campus.
     public void viewAllBuildings() {
 
     }
@@ -135,7 +190,7 @@ public class DormManagement {
         jdbc_db database = new jdbc_db();
         database.connect(username, password);
         database.initDatabase();
-        System.out.println("hey man");
+        //System.out.println("hey man");
 
         Room room = new Room();
         Building building = new Building();
@@ -196,7 +251,8 @@ public class DormManagement {
             if (args.length != 2) {
                 System.out.println("ERROR: Invalid Usage: java DormManagement <buildingID>");
                 return;
-            } else {
+            } 
+            else {
                 int buildingId;
                 try {
                     buildingId = Integer.parseInt(args[1]);
@@ -204,14 +260,39 @@ public class DormManagement {
                     System.out.println("ERROR: Invalid string format. Cannot convert to integer.");
                     return;
                 }
+
                 if(!database.buildingExists(buildingId)) {
                     System.out.println("ERROR: Invalid buildingID. Please check the value exists.");
                     return;
-                } else {
+                } 
+                else {
                     dormManager.viewAssignments(database, buildingId);
                 }
             }
         } 
+        else if (actionPage.equals("viewMatchingRooms")) {
+            if (args.length != 2) {
+                System.out.println("ERROR: Invalid Usage: java DormManagement <buildingID>");
+                return;
+            } 
+            else {
+                int studentID;
+                try {
+                    studentID = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Invalid string format. Cannot convert to integer.");
+                    return;
+                }
+
+                if(!database.studentExists(studentID)) {
+                    System.out.println("ERROR: Invalid studentID. Please check the value exists.");
+                    return;
+                } 
+                else {
+                    dormManager.viewMatchingRooms(studentID, database);
+                }
+            }
+        }
         else if (actionPage.equals("viewMatchingStudents")) {
 
         } 

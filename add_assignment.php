@@ -3,6 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 $toastMessage = "";
+$toastIsSuccess = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     $actionPage = "addAssignment";
@@ -21,26 +22,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     try {
         exec($command, $output, $returnStatus);
-
         $outputMessage = implode("\n", $output);
-    
+
         if (strpos($outputMessage, "ERROR") !== false) {
             $toastMessage = $outputMessage;
         } else {
             $toastMessage = "Assignment created successfully!";
+            $toastIsSuccess = true;
         }
     } catch (Exception $e) {
-        $toastMessage = "? PHP Exception: " . $e->getMessage();
+        $toastMessage = "PHP Exception: " . $e->getMessage();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Add a Student</title>
+    <title>Create Assignment</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -52,26 +54,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     <div id="toast" class="toast-top"></div>
 
     <script>
-        function showToast(message) {
+        function showToast(message, isSuccess) {
             const toast = document.getElementById("toast");
             toast.innerHTML = message.replace(/\n/g, "<br>");
-            toast.classList.add("show");
+            toast.className = "toast-top show " + (isSuccess ? "toast-success" : "toast-error");
             setTimeout(() => {
                 toast.classList.remove("show");
             }, 5000);
         }
 
-        <?php if (!empty($toastMessage)) : ?>
-        document.addEventListener("DOMContentLoaded", () => {
-            showToast(<?= json_encode($toastMessage) ?>);
-        });
+        <?php if (!empty($toastMessage)): ?>
+            document.addEventListener("DOMContentLoaded", () => {
+                showToast(<?= json_encode($toastMessage) ?>, <?= $toastIsSuccess ? 'true' : 'false' ?>);
+            });
         <?php endif; ?>
     </script>
 
+
     <main class="container">
-        <div class="panel" style="max-width: 500px; width: 100%;">
+        <div class="panel">
             <form method="post" action="add_assignment.php" class="styled-form">
-                <label for="studentID">ID:</label>
+                <label for="studentID">Student ID:</label>
                 <input type="text" name="studentID" id="studentID" required>
 
                 <label for="buildingID">Building ID:</label>
@@ -83,9 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
                 <input type="submit" name="submit" value="Create Assignment" class="op-button">
             </form>
 
-            <div style="margin-top: 1rem;">
-                <a href="home.php" class="op-button" style="text-decoration: none;">Back to Home</a>
-            </div>
+            <a href="home.php" class="op-button">Back to Home</a>
         </div>
     </main>
 

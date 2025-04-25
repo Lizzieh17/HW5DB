@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>View Report</title>
+    <title>View All Room</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- view all rooms sorted by buildingID and show numbers of bedrooms available per room -->
     <header>
-        <h1>View Building Report</h1>
+        <h1>View All Room</h1>
     </header>
 
     <main class="container">
         <div class="panel" style="max-width: 600px; width: 100%;">
             <?php
-                $actionPage = 'viewReport';
+                $actionPage = 'ViewRoom';
 
                 $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' . escapeshellarg($actionPage);
                 $command = escapeshellcmd($command);

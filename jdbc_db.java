@@ -109,9 +109,9 @@ public class jdbc_db {
          statement.executeUpdate(query);
          System.out.println("inserted");
       } catch (SQLException e) {
-         System.out.println("ERROR: not inserted");
-         System.out.println("ERROR: Query: " + query);
-         System.out.println("ERROR:" + e);
+         // System.out.println("ERROR: not inserted");
+         // System.out.println("ERROR: Query: " + query);
+         // System.out.println("ERROR:" + e);
          e.printStackTrace();
       }
    }
@@ -124,7 +124,7 @@ public class jdbc_db {
 
          try {
             statement.executeUpdate(query);
-            System.out.println("ERROR: Table '" + tableName + "' created successfully.");
+            // System.out.println("ERROR: Table '" + tableName + "' created successfully.");
          } catch (SQLException e) {
             e.printStackTrace();
          }
@@ -154,15 +154,16 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            System.out.println("ERROR: Couldn't find student");
+            // System.out.println("ERROR: Couldn't find student");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         System.out.println("ERROR: Couldn't find student");
+         // System.out.println("ERROR: Couldn't find student");
          return false;
       }
    }
+
    public boolean buildingExists(int buildingID) {
       String q = "SELECT COUNT(*) FROM Building WHERE buildingID = " + buildingID + ";";
       try {
@@ -170,15 +171,16 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            System.out.println("ERROR: Couldn't find building");
+            // System.out.println("ERROR: Couldn't find building");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         System.out.println("ERROR: Couldn't find building");
+         // System.out.println("ERROR: Couldn't find building");
          return false;
       }
    }
+
    public boolean roomExists(int roomID) {
       String q = "SELECT COUNT(*) FROM Room WHERE roomID = " + roomID + ";";
       try {
@@ -186,32 +188,85 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            System.out.println("ERROR: Couldn't find room");
+            // System.out.println("ERROR: Couldn't find room");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         System.out.println("ERROR: Couldn't find room");
+         // System.out.println("ERROR: Couldn't find room");
          return false;
       }
    }
 
-   // public boolean roomFull(int roomID) {
-   //    String q = "SELECT COUNT(*) FROM Assignment WHERE roomID = " + roomID + ";";
-   //    try {
-   //       ResultSet resultSet = statement.executeQuery(q);
-   //       if (resultSet.next()) {
-   //          return resultSet.getInt(1) > 0;
-   //       } else {
-   //          System.out.println("Couldn't find room");
-   //          return false;
-   //       }
-   //    } catch (SQLException e) {
-   //       e.printStackTrace();
-   //       System.out.println("Couldn't find room");
-   //       return false;
-   //    }
-   // }
+   public String printReport() {
+      // 7) View a report that lists, for each building, the number of total bedrooms,
+      // the number of total rooms, the number of rooms with some availability left,
+      // and the number of total bedrooms with some availability. At the bottom,
+      // create summary of number of total bedrooms available on campus.
+
+      StringBuilder builder = new StringBuilder();
+
+      // Query to get details for each building
+      String query = "SELECT B.name AS buildingName, " +
+            "COUNT(R.roomID) AS totalRooms, " +
+            "SUM(R.numBeds) AS totalBeds, " +
+            "SUM(CASE WHEN A.studentID IS NULL OR RoomCount.roomOccupants < R.numBeds THEN 1 ELSE 0 END) AS roomsWithAvailability, "
+            +
+            "SUM(CASE " +
+            "WHEN A.studentID IS NULL THEN R.numBeds " +
+            "WHEN RoomCount.roomOccupants < R.numBeds THEN R.numBeds - RoomCount.roomOccupants " +
+            "ELSE 0 END) AS availableBeds " +
+            "FROM Building B " +
+            "JOIN Room R ON B.buildingID = R.buildingID " +
+            "LEFT JOIN ( " +
+            "SELECT roomID, COUNT(studentID) AS roomOccupants " +
+            "FROM Assignment GROUP BY roomID ) AS RoomCount " +
+            "ON R.roomID = RoomCount.roomID " +
+            "LEFT JOIN Assignment A ON R.roomID = A.roomID " +
+            "GROUP BY B.name ORDER BY B.name;";
+
+      try {
+         ResultSet resultSet = statement.executeQuery(query);
+
+         // Adding header to the report
+         builder.append("<br>---------------------------------<br>");
+
+         // Processing and displaying the result
+         while (resultSet.next()) {
+            String buildingName = resultSet.getString("buildingName");
+            int totalRooms = resultSet.getInt("totalRooms");
+            int totalBeds = resultSet.getInt("totalBeds");
+            int roomsWithAvailability = resultSet.getInt("roomsWithAvailability");
+            int availableBeds = resultSet.getInt("availableBeds");
+
+            builder.append("<br>Building: " + buildingName + "<br>");
+            builder.append("Total Rooms: " + totalRooms + "<br>");
+            builder.append("Total Beds: " + totalBeds + "<br>");
+            builder.append("Rooms with Availability: " + roomsWithAvailability + "<br>");
+            builder.append("Available Beds: " + availableBeds + "<br><br>");
+         }
+
+         // Query to get total available beds on campus
+         String totalAvailableBedsQuery = "SELECT SUM(availableBeds) AS totalAvailableBeds FROM ( " +
+               "SELECT R.roomID, R.numBeds, COUNT(A.studentID) AS occupants, " +
+               "R.numBeds - COUNT(A.studentID) AS availableBeds " +
+               "FROM Room R " +
+               "LEFT JOIN Assignment A ON R.roomID = A.roomID " +
+               "GROUP BY R.roomID, R.numBeds HAVING availableBeds > 0 ) AS RoomAvailability;";
+
+         resultSet = statement.executeQuery(totalAvailableBedsQuery);
+
+         if (resultSet.next()) {
+            int totalAvailableBeds = resultSet.getInt("totalAvailableBeds");
+            builder.append("<br>Total Available Beds on Campus: " + totalAvailableBeds + "<br>");
+         }
+
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+
+      return builder.toString();
+   }
 
    // Remove all records and fill them with values for testing
    // Assumes that the tables are already created

@@ -33,11 +33,11 @@ public class DormManagement {
 
     // 1) Add a student to the Students table
     public void addStudent(Student student, jdbc_db database) {
-        System.out.println("Hello from add");
         if (student.studentID == null || student.name.isEmpty() || student.wantsAC == null
                 || student.wantsKitchen == null || student.wantsPrivateBath == null) {
             System.out.println("ERROR: nop at student");
-        } else {
+        }
+        else {
             String input = student.studentID + ", '" + student.name + "', " + student.wantsAC + ", "
                     + student.wantsDining + ", " + student.wantsKitchen + ", " + student.wantsPrivateBath;
             database.insert("Student (studentID, name, wantsAC, wantsDining, wantsKitchen, wantsPrivateBath)", input);
@@ -58,47 +58,55 @@ public class DormManagement {
     // 3) View all the assignments in a building, i.e., which students are in which rooms, sorted by student Name.
     public void viewAssignments(jdbc_db database, int buildingId) throws SQLException {
         StringBuilder assignmentResult = new StringBuilder();
-
+    
         String buildingName = "Couldn't find building";
-        String q1 = "SELECT Building.name FROM Building AS buildingName " +
-                    "WHERE Assignment.buildingID = " + buildingId;
-        String q2 = "SELECT Assignment.roomID, Student.name FROM Assignment " + 
-                    "JOIN Student ON Assignment.studentID = Student.studentID " +
-                    "WHERE Assignment.buildingID = " + buildingId +
-                    " ORDER BY Student.name, Assignment.roomID";
-        try{
+        String q1 = "SELECT B.name AS buildingName " +
+                    "FROM Assignment A " +
+                    "JOIN Building B ON A.buildingID = B.buildingID " +
+                    "WHERE A.buildingID = " + buildingId + " LIMIT 1";
+    
+        String q2 = "SELECT A.roomID, S.name " +
+                    "FROM Assignment A " +
+                    "JOIN Student S ON A.studentID = S.studentID " +
+                    "WHERE A.buildingID = " + buildingId + 
+                    " ORDER BY S.name, A.roomID";
+    
+        try {
             ResultSet resultSet1 = database.statement.executeQuery(q1);
-            if(resultSet1.next()){
+            if (resultSet1.next()) {
                 buildingName = resultSet1.getString("buildingName");
             }
-
-            if(buildingName.equals("Couldn't find building")){
-                System.out.println("ERROR: Coulnd't find building");
+    
+            if (buildingName.equals("Couldn't find building")) {
+                System.out.println("ERROR: Couldn't find building");
                 return;
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
+            return;
         }
+    
         System.out.println(buildingName);
-
-        try{
+    
+        try {
             ResultSet resultSet2 = database.statement.executeQuery(q2);
-            while(resultSet2.next()){
+            while (resultSet2.next()) {
                 int roomID = resultSet2.getInt("roomID");
                 String studentName = resultSet2.getString("name");
                 assignmentResult.append(roomID).append(" | ").append(studentName).append("\n");
             }
-
-            if(assignmentResult.length() == 0 ){
-                assignmentResult.append("ERROR: Coulnd't find any assignments");
-                return;
+    
+            if (assignmentResult.length() == 0) {
+                assignmentResult.append("ERROR: Couldn't find any assignments");
             }
-        }catch (SQLException e){
+    
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+    
         System.out.println(assignmentResult.toString());
     }
-
+    
     // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
     public void viewAvailableRooms() {
 
@@ -169,22 +177,42 @@ public class DormManagement {
  
     }
 
-    // 7) View a report that lists, for each building, the number of total bedrooms, 
-    //    the number of total rooms, the number of rooms with some availability left, 
-    //    and the number of total bedrooms with some availability. At the bottom, 
-    //    create summary of number of total bedrooms available on campus.
-    public void viewAllBuildings() {
+    public void viewAllBuildings(jdbc_db database) {
+        StringBuilder buildingList = new StringBuilder();
+        String query = "SELECT * FROM Building ORDER BY buildingID";
+        try {
+            ResultSet resultSet = database.statement.executeQuery(query);
+            while (resultSet.next()) {
+                int buildingID = resultSet.getInt("buildingID");
+                String name = resultSet.getString("name");
+                String address = resultSet.getString("address");
+                boolean hasAC = resultSet.getBoolean("hasAC");
+                boolean hasDining = resultSet.getBoolean("hasDining");
 
+                buildingList.append(buildingID).append(" | ")
+                            .append(name).append(" | ")
+                            .append(address).append(" | ")
+                            .append(hasAC).append(" | ")
+                            .append(hasDining).append("\n");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println(buildingList.toString());
     }
 
+    public void viewReport(jdbc_db database) throws SQLException {
+        System.out.println("Report: ");
+        System.out.println(database.printReport());
+    }
 
 
     public static void main(String[] args) throws SQLException {
 
-        String username = "lal013";
-        String password = "ooveiz0M";
-        // String username = "seh051";
-        // String password = "Eiza0eiv";
+        // String username = "lal013";
+        // String password = "ooveiz0M";
+        String username = "seh051";
+        String password = "Eiza0eiv";
         DormManagement dormManager = new DormManagement();
 
         jdbc_db database = new jdbc_db();
@@ -201,7 +229,7 @@ public class DormManagement {
 
         if (actionPage.equals("addStudent")) {
             if (args.length != 7) {
-                System.out.println("ERROR: Invalid Usage: java DormManagement <id> <name> <wantsAC> <wantsDining> <wantsKitchen> <wantsPrivateBath>");
+                System.out.println("ERROR: Please enter all values");
                 return;
             } else {
                 try {
@@ -219,14 +247,17 @@ public class DormManagement {
                 if(database.studentExists(student.studentID)){
                     System.out.println("ERROR: Student already found with <studentID>");
                     return;
-                }      
-                else
+                } else if (student.studentID < 1000){
+                    System.out.println("ERROR: Invalid studentID. Please follow the example.");
+                    return;
+                } else{
                     dormManager.addStudent(student, database);
+                }
             }
         } 
         else if (actionPage.equals("addAssignment")) {
             if (args.length != 4) {
-                System.out.println("ERROR: Invalid Usage: java DormManagement <studentID> <buildingID> <roomID>");
+                System.out.println("ERROR: Please enter all values");
                 return;
             } else {
                 try {
@@ -249,7 +280,7 @@ public class DormManagement {
         } 
         else if (actionPage.equals("viewAssignments")) {
             if (args.length != 2) {
-                System.out.println("ERROR: Invalid Usage: java DormManagement <buildingID>");
+                System.out.println("ERROR: Please enter all values");
                 return;
             } 
             else {
@@ -297,9 +328,10 @@ public class DormManagement {
 
         } 
         else if (actionPage.equals("viewAllBuildings")) {
-
+            dormManager.viewAllBuildings(database);
+        } else if (actionPage.equals("viewReport")) {
+            dormManager.viewReport(database);
         }
-
         database.disConnect();
 
     }

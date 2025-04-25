@@ -140,7 +140,6 @@ public class DormManagement {
                     "JOIN Building ON Room.buildingID = Building.buildingID " + 
                     "WHERE Building.hasAC = " + wantsAC.toString() + " AND Building.hasDining = " + wantsDining.toString() + 
                     " AND Room.hasKitchen = " + wantsKitchen.toString() + " AND Room.hasPrivateBaths = " + wantsPrivateBath.toString();
-        //System.out.println(q2);
         try{
             ResultSet resultSet2 = database.statement.executeQuery(q2);
             while(resultSet2.next()){
@@ -173,8 +172,56 @@ public class DormManagement {
     }
 
     // 6) View all students that could room with a given student (i.e., have the same requests)
-    public void viewMatchingStudents() {
- 
+    public void viewMatchingStudents(int givenStudentID, jdbc_db database) {
+        StringBuilder matchingStudents = new StringBuilder();
+        Boolean givenWantsAC = false, givenWantsDining = false, givenWantsKitchen = false, givenWantsPrivateBath = false;
+
+        String q1 = "SELECT Student.wantsAC, Student.wantsDining, Student.wantsKitchen, Student.wantsPrivateBath " +
+                   "FROM Student WHERE Student.studentID = " + givenStudentID;
+        try{
+            ResultSet resultSet1 = database.statement.executeQuery(q1);
+            if(resultSet1.next()){
+                givenWantsAC = resultSet1.getBoolean("wantsAC");
+                givenWantsDining = resultSet1.getBoolean("wantsDining");
+                givenWantsKitchen = resultSet1.getBoolean("wantsKitchen"); 
+                givenWantsPrivateBath = resultSet1.getBoolean("wantsPrivateBath");
+            }
+            else{
+                System.out.println("ERROR: Coulnd't find student");
+                return;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }       
+        
+        String q2 = "SELECT Student.studentID, Student.name, Student.wantsAC, Student.wantsDining, Student.wantsKitchen, Student.wantsPrivateBath " +
+                   "FROM Student WHERE Student.wantsAC = " + givenWantsAC.toString() + " AND Student.wantsDining = " + givenWantsDining.toString() + 
+                   " AND  Student.wantsKitchen = " + givenWantsKitchen.toString() + " AND  Student.wantsPrivateBath = " + givenWantsPrivateBath.toString();
+        try{
+            ResultSet resultSet2 = database.statement.executeQuery(q2);
+            while(resultSet2.next()){
+                int studentID = resultSet2.getInt("studentID");
+                String studentName = resultSet2.getString("name");
+                boolean wantsAC  = resultSet2.getBoolean("wantsAC");
+                boolean wantsDining = resultSet2.getBoolean("wantsDining");
+                boolean wantsKitchen = resultSet2.getBoolean("wantsKitchen");
+                boolean wantsPrivateBath = resultSet2.getBoolean("wantsPrivateBath");
+                matchingStudents.append(studentID).append(" | ")
+                                .append(studentName).append(" | ")
+                                .append(wantsAC).append(" | ")
+                                .append(wantsDining).append(" | ")  
+                                .append(wantsKitchen).append(" | ")
+                                .append(wantsPrivateBath).append("\n");
+            }
+
+            if(matchingStudents.length() == 0 ){
+                matchingStudents.append("ERROR: Coulnd't find any students");
+                return;
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        System.out.println(matchingStudents.toString());
     }
 
     public void viewAllBuildings(jdbc_db database) {
@@ -209,10 +256,10 @@ public class DormManagement {
 
     public static void main(String[] args) throws SQLException {
 
-        // String username = "lal013";
-        // String password = "ooveiz0M";
-        String username = "seh051";
-        String password = "Eiza0eiv";
+        String username = "lal013";
+        String password = "ooveiz0M";
+        // String username = "seh051";
+        // String password = "Eiza0eiv";
         DormManagement dormManager = new DormManagement();
 
         jdbc_db database = new jdbc_db();
@@ -325,7 +372,27 @@ public class DormManagement {
             }
         }
         else if (actionPage.equals("viewMatchingStudents")) {
+            if (args.length != 2) {
+                System.out.println("ERROR: Invalid Usage: java DormManagement <buildingID>");
+                return;
+            } 
+            else {
+                int studentID;
+                try {
+                    studentID = Integer.parseInt(args[1]);
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Invalid string format. Cannot convert to integer.");
+                    return;
+                }
 
+                if(!database.studentExists(studentID)) {
+                    System.out.println("ERROR: Invalid studentID. Please check the value exists.");
+                    return;
+                } 
+                else {
+                    dormManager.viewMatchingStudents(studentID, database);
+                }
+            }
         } 
         else if (actionPage.equals("viewAllBuildings")) {
             dormManager.viewAllBuildings(database);

@@ -1,47 +1,120 @@
-<html>
-    <head>
-        <link rel="stylesheet" href="styles.css">
-        <title>Add a student</title>
-    </head>
-
-    <body>
-        <div>
-            <div class="block-container">
-                <div id="form1" class="form-container">
-                    <form method="post" action="add_student.php">
-                        ID: <input type="text" name="studentID"><br>
-                        Name: <input type="text" name="name"><br>
-                        WantsAC: <input type="checkbox" name="wantsAC" value="true"><br>
-                        WantsDining: <input type="checkbox" name="wantsDining" value="true"><br>
-                        WantsKitchen: <input type="checkbox" name="wantsKitchen" value="true"><br>
-                        WantsPrivateBath: <input type="checkbox" name="wantsPrivateBath" value="true"><br>
-                        <input type="submit" name='submit' value="Add Student">
-                    </form>
-                </div>
-            </div>
-
-            <a href="home.php">Back to Home</a> 
-        </div>
-    </body> 
-</html>
-
 <?php
-if(isset($_POST['submit'])){
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-    $actionPage = "addStudent";
-    $studentID = $_POST['studentID'] ?? '';
-    $name = $_POST['name'] ?? '';
-    $wantsAC = isset($_POST['wantsAC']) ? 'true' : 'false';
-    $wantsDining = isset($_POST['wantsDining']) ? 'true' : 'false';
-    $wantsKitchen = isset($_POST['wantsKitchen']) ? 'true' : 'false';
-    $wantsPrivateBath = isset($_POST['wantsPrivateBath']) ? 'true' : 'false';
-
-    //$jsonStudent = escapeshellarg(json_encode($student));
-    $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' . 
-                escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID) . ' ' . escapeshellarg($name) . ' ' .  
-                escapeshellarg($wantsAC) . ' ' . escapeshellarg($wantsKitchen) . ' ' . escapeshellarg($wantsDining) . ' ' . escapeshellarg($wantsPrivateBath);
-
-    $command = escapeshellcmd($command);
-    system($command); 
-} 
+$toastMessage = "";
+$toastIsSuccess = false;
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>View All Students that Match with Given Student</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Toast Script -->
+    <script>
+        function showToast(message, isSuccess) {
+            const toast = document.getElementById("toast");
+            toast.innerHTML = message.replace(/\n/g, "<br>");
+            toast.className = "toast-top show " + (isSuccess ? "toast-success" : "toast-error");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 5000);
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>Matching Students for Student</h1>
+    </header>
+
+    <div id="toast" class="toast-top"></div>
+
+    <main class="container">
+        <?php
+        if (isset($_POST['submit'])) {
+            $actionPage = "viewMatchingStudents";
+            $studentID = $_POST['studentID'] ?? '';
+
+            $command = 'java -cp .:mysql-connector-java-5.1.40-bin.jar DormManagement ' .
+                escapeshellarg($actionPage) . ' ' . escapeshellarg($studentID);
+            $command = escapeshellcmd($command);
+
+            $output = [];
+            $status = 0;
+            exec($command, $output, $status);
+            $outputMessage = implode("\n", $output);
+
+            if (strpos($outputMessage, "ERROR") !== false) {
+                $toastMessage = $outputMessage;
+                $toastIsSuccess = false;
+            } else {
+                if (count($output) > 0 && !empty($output[0])) {
+                    echo '<div class="results-container">';
+                    echo '<h2>Matching Students for Student: ' . htmlspecialchars($studentID) . '</h2>';
+                    echo '<table class="results-table">';
+                    echo '<tr><th>Student ID</th><th>Student Name</th><th>Wants AC</th><th>Wants Dining</th>';
+                    echo '<th>Wants Kitchen</th><th>Wants Private Bath</th></tr>';
+
+                    foreach ($output as $line) {
+                        $line = trim($line);
+                        if (!empty($line)) {
+                            $parts = explode(" | ", $line);
+                            if (count($parts) >= 6) {
+                                echo '<tr>';
+                                foreach ($parts as $value) {
+                                    echo '<td>' . htmlspecialchars($value) . '</td>';
+                                }
+                                echo '</tr>';
+                            }
+                        }
+                    }
+
+                    echo '</table>';
+                    echo '</div>';
+                } else {
+                    echo '<div class="results-container">';
+                    echo '<p class="no-results">No matching students found for this student.</p>';
+                    echo '</div>';
+                    $toastMessage = "No matching students found for this student.";
+                    $toastIsSuccess = false;
+                }
+            }
+        }
+        ?>
+
+        <div class="panel" style="max-width: 600px; width: 100%;">
+            <form method="post" action="matching_students.php" class="styled-form">
+                <label for="studentID">Student ID:</label>
+                <input type="text" name="studentID" id="studentID" required>
+
+                <input type="submit" name="submit" value="Show Students">
+            </form>
+
+            <div style="margin-top: 1rem;">
+                <a href="home.php" class="op-button" style="text-decoration: none;">Back to Home</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Created by Luke Lyons and Lizzie Howell</p>
+    </footer>
+
+    <?php if (!empty($toastMessage)): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                showToast(
+                    <?= json_encode($toastMessage) ?>,
+                    <?= json_encode($toastIsSuccess) ?>
+                );
+            });
+        </script>
+    <?php endif; ?>
+</body>
+
+</html>

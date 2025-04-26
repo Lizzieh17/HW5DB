@@ -1,7 +1,5 @@
 import java.sql.*;
 
-import javax.swing.text.View;
-
 class Room {
     Integer roomID, buildingID, numBeds;
     Boolean hasPrivateBaths, hasKitchen;
@@ -26,7 +24,6 @@ public class DormManagement {
 
     // Project functions
 
-    // 1) Add a student to the Students table
     public void addStudent(Student student, jdbc_db database) {
         if (student.studentID == null || student.name.isEmpty() || student.wantsAC == null
                 || student.wantsKitchen == null || student.wantsPrivateBath == null) {
@@ -39,7 +36,6 @@ public class DormManagement {
         }
     }
     
-    // 2) Add an assignment to Assignment table. Check that the assignment meets the student's requirements.
     public void addAssignement(Assignment assignment, jdbc_db database) {
         if (assignment.studentID == null || assignment.buildingID == null || assignment.roomID == null) {
             System.out.println("ERROR: nop at assignment");
@@ -53,8 +49,6 @@ public class DormManagement {
         }
     }
 
-    //building name grab not working will fix later
-    // 3) View all the assignments in a building, i.e., which students are in which rooms, sorted by student Name.
     public void viewAssignments(jdbc_db database, int buildingId) throws SQLException {
         StringBuilder assignmentResult = new StringBuilder();
     
@@ -106,7 +100,6 @@ public class DormManagement {
         System.out.println(assignmentResult.toString());
     }
     
-    // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
     public void viewAllRooms(jdbc_db database) {
         StringBuilder roomList = new StringBuilder();
         String q = "SELECT Room.buildingID, Room.roomID, Room.numBeds, (Room.numBeds - COUNT(Assignment.studentID)) AS availableBeds, COUNT(Assignment.studentID) AS occupiedBeds " +
@@ -141,7 +134,6 @@ public class DormManagement {
         
     }
 
-    // 5) View all available rooms that meet a student's request, e.g., matches their desire for a private bathroom (or not), kitchen, etc.
     public void viewMatchingRooms(int studentID, jdbc_db database) {
         StringBuilder matchingRooms = new StringBuilder();
         Boolean wantsAC = false, wantsDining = false, wantsKitchen = false, wantsPrivateBath = false;
@@ -200,7 +192,6 @@ public class DormManagement {
         System.out.println(matchingRooms.toString());
     }
 
-    // 6) View all students that could room with a given student (i.e., have the same requests)
     public void viewMatchingStudents(int givenStudentID, jdbc_db database) {
         StringBuilder matchingStudents = new StringBuilder();
         Boolean givenWantsAC = false, givenWantsDining = false, givenWantsKitchen = false, givenWantsPrivateBath = false;
@@ -284,16 +275,15 @@ public class DormManagement {
 
     public static void main(String[] args) throws SQLException {
 
-        String username = "lal013";
-        String password = "ooveiz0M";
-        // String username = "seh051";
-        // String password = "Eiza0eiv";
+        // String username = "lal013";
+        // String password = "ooveiz0M";
+        String username = "seh051";
+        String password = "Eiza0eiv";
         DormManagement dormManager = new DormManagement();
 
         jdbc_db database = new jdbc_db();
         database.connect(username, password);
         database.initDatabase();
-        //System.out.println("hey man");
 
         Room room = new Room();
         Building building = new Building();
@@ -319,7 +309,6 @@ public class DormManagement {
                     System.out.println("ERROR: Invalid string format. Cannot convert to integer.");
                 }
 
-                //Checking to see if student exists
                 if(database.studentExists(student.studentID)){
                     System.out.println("ERROR: Student already found with <studentID>");
                     return;
@@ -347,7 +336,6 @@ public class DormManagement {
                 if (!database.studentExists(assignment.studentID) || !database.buildingExists(assignment.buildingID) || !database.roomExists(assignment.roomID)){
                     System.out.println("ERROR: Invalid studentID, buildingID, or roomID. Please check the values exists.");
                 } 
-                //if(!database.roomsFull(roomID)) and need to check to see if room and building match
                 else {
                     dormManager.addAssignement(assignment, database);
                 }

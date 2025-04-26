@@ -109,9 +109,6 @@ public class jdbc_db {
          statement.executeUpdate(query);
          System.out.println("inserted");
       } catch (SQLException e) {
-         // System.out.println("ERROR: not inserted");
-         // System.out.println("ERROR: Query: " + query);
-         // System.out.println("ERROR:" + e);
          e.printStackTrace();
       }
    }
@@ -124,7 +121,6 @@ public class jdbc_db {
 
          try {
             statement.executeUpdate(query);
-            // System.out.println("ERROR: Table '" + tableName + "' created successfully.");
          } catch (SQLException e) {
             e.printStackTrace();
          }
@@ -154,12 +150,10 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            // System.out.println("ERROR: Couldn't find student");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         // System.out.println("ERROR: Couldn't find student");
          return false;
       }
    }
@@ -171,12 +165,10 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            // System.out.println("ERROR: Couldn't find building");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         // System.out.println("ERROR: Couldn't find building");
          return false;
       }
    }
@@ -242,11 +234,6 @@ public class jdbc_db {
    }
 
    public String printReport() {
-      // 7) View a report that lists, for each building, the number of total bedrooms,
-      // the number of total rooms, the number of rooms with some availability left,
-      // and the number of total bedrooms with some availability. At the bottom,
-      // create summary of number of total bedrooms available on campus.
-
       StringBuilder builder = new StringBuilder();
 
       // Query to get details for each building

@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 $toastMessage = "";
 $toastIsSuccess = false;
 ?>
@@ -14,7 +11,6 @@ $toastIsSuccess = false;
     <title>View All Students that Match with Given Student</title>
     <link rel="stylesheet" href="styles.css">
 
-    <!-- Toast Script -->
     <script>
         function showToast(message, isSuccess) {
             const toast = document.getElementById("toast");

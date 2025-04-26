@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 $toastMessage = "";
 $toastIsSuccess = false;
 
@@ -73,6 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
     <main class="container">
         <div class="panel">
+        <p>Example:</p>
+            <p>Student ID: 1001</p>
+            <p>Building ID: 1</p>
+            <p>RoomID: 102</p>
             <form method="post" action="add_assignment.php" class="styled-form">
                 <label for="studentID">Student ID:</label>
                 <input type="text" name="studentID" id="studentID" required>

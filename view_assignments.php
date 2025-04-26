@@ -26,7 +26,7 @@
 
     <main class="container">
         <?php
-        $toastMessage = ""; // Initialize toastMessage variable
+        $toastMessage = "";
         
         if (isset($_POST['submit'])) {
             $actionPage = "viewAssignments";
@@ -86,7 +86,6 @@
         <p>Created by Luke Lyons and Lizzie Howell</p>
     </footer>
 
-    <!-- Toast message trigger -->
     <script>
         <?php if (!empty($toastMessage)) : ?>
             document.addEventListener("DOMContentLoaded", () => {

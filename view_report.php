@@ -7,7 +7,7 @@
 </head>
 <body>
     <header>
-        <h1>View Building Report</h1>
+        <h1>View Report</h1>
     </header>
 
     <main class="container">

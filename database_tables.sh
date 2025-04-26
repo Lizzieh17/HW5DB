@@ -2,10 +2,10 @@ mysql <<EOFMYSQL
 use lal013;
 show tables;
 
-DROP TABLE IF EXISTS Building;
+DROP TABLE IF EXISTS Assignment;
 DROP TABLE IF EXISTS Room;
 DROP TABLE IF EXISTS Student;
-DROP TABLE IF EXISTS Assignment;
+DROP TABLE IF EXISTS Building;
 
 CREATE TABLE Building(
     buildingID INT PRIMARY KEY, 

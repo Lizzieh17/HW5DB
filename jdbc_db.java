@@ -188,14 +188,57 @@ public class jdbc_db {
          if (resultSet.next()) {
             return resultSet.getInt(1) > 0;
          } else {
-            // System.out.println("ERROR: Couldn't find room");
             return false;
          }
       } catch (SQLException e) {
          e.printStackTrace();
-         // System.out.println("ERROR: Couldn't find room");
          return false;
       }
+   }
+
+   public boolean roomIsAvailable(int roomID, int buildingID){
+      int numBeds, numBedsTaken;
+      String q1 = "SELECT Room.numBeds, Room.buildingID FROM Room WHERE Room.roomID = " + roomID ;
+      try {
+         ResultSet resultSet = statement.executeQuery(q1);
+         if (resultSet.next()) {
+            numBeds = resultSet.getInt("numBeds");
+            int expectedBuildingID = resultSet.getInt("buildingID");
+
+            if (buildingID != expectedBuildingID) {
+               System.out.println("ERROR: Room is in a different building.");
+               return false;
+           }
+         } 
+         else {
+            System.out.println("ERROR: Couldn't find room");
+            return false;
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return false;
+      }
+
+      String q2 = "SELECT COUNT(Assignment.studentID) AS occupiedBeds " + 
+                  "FROM Room LEFT JOIN Assignment ON Room.roomID = Assignment.roomID " +
+                  "WHERE Room.roomID = " + roomID + " GROUP BY Room.roomID";
+      try {
+         ResultSet resultSet = statement.executeQuery(q2);
+         if (resultSet.next()) {
+            numBedsTaken = resultSet.getInt("occupiedBeds");
+         } else {
+            System.out.println("ERROR: Couldn't find beds");
+            return false;
+         }
+      } catch (SQLException e) {
+         e.printStackTrace();
+         return false;
+      }
+
+      if(numBeds - numBedsTaken > 0)
+         return true;
+      else
+         return false;
    }
 
    public String printReport() {

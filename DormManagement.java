@@ -24,12 +24,7 @@ class Assignment {
 
 public class DormManagement {
 
-    // Public constructors
-
-    public DormManagement() {
-    }
     // Project functions
-
 
     // 1) Add a student to the Students table
     public void addStudent(Student student, jdbc_db database) {
@@ -48,7 +43,11 @@ public class DormManagement {
     public void addAssignement(Assignment assignment, jdbc_db database) {
         if (assignment.studentID == null || assignment.buildingID == null || assignment.roomID == null) {
             System.out.println("ERROR: nop at assignment");
-        } else {
+        } 
+        else if(!database.roomIsAvailable(assignment.roomID, assignment.buildingID)){
+            System.out.println("ERROR: Room not available");
+        }
+        else {
             String input = assignment.studentID + ", " + assignment.buildingID + ", " + assignment.roomID;
             database.insert("Assignment (studentID, buildingID, roomID)", input);
         }
@@ -108,8 +107,38 @@ public class DormManagement {
     }
     
     // 4) View all the rooms, sorted by buildingId. Display how many bedrooms are available per room
-    public void viewAvailableRooms() {
+    public void viewAllRooms(jdbc_db database) {
+        StringBuilder roomList = new StringBuilder();
+        String q = "SELECT Room.buildingID, Room.roomID, Room.numBeds, (Room.numBeds - COUNT(Assignment.studentID)) AS availableBeds, COUNT(Assignment.studentID) AS occupiedBeds " +
+               "FROM Room LEFT JOIN Assignment ON Room.roomID = Assignment.roomID " +
+               "GROUP BY Room.roomID, Room.buildingID, Room.numBeds " +
+               "ORDER BY Room.buildingID, Room.roomID";
 
+        try{
+            ResultSet resultSet = database.statement.executeQuery(q);
+            if (!resultSet.isBeforeFirst()) {
+                roomList.append("No rooms found in the database");
+            } 
+            else {
+                while (resultSet.next()) {
+                    int buildingID = resultSet.getInt("buildingID");
+                    int roomID = resultSet.getInt("roomID");
+                    int numBeds = resultSet.getInt("numBeds");
+                    int availableBeds = resultSet.getInt("availableBeds");
+                    int occupiedBeds = resultSet.getInt("occupiedBeds");
+                    
+                    roomList.append(buildingID).append(" | ")
+                           .append(roomID).append(" | ")
+                           .append(numBeds).append(" | ")
+                           .append(availableBeds).append(" | ")
+                           .append(occupiedBeds).append("\n");
+                }
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        System.out.println(roomList.toString());
+        
     }
 
     // 5) View all available rooms that meet a student's request, e.g., matches their desire for a private bathroom (or not), kitchen, etc.
@@ -253,7 +282,6 @@ public class DormManagement {
         System.out.println(database.printReport());
     }
 
-
     public static void main(String[] args) throws SQLException {
 
         String username = "lal013";
@@ -278,7 +306,8 @@ public class DormManagement {
             if (args.length != 7) {
                 System.out.println("ERROR: Please enter all values");
                 return;
-            } else {
+            } 
+            else {
                 try {
                     student.studentID = Integer.parseInt(args[1]);
                     student.name = args[2];
@@ -306,7 +335,8 @@ public class DormManagement {
             if (args.length != 4) {
                 System.out.println("ERROR: Please enter all values");
                 return;
-            } else {
+            } 
+            else {
                 try {
                     assignment.studentID = Integer.parseInt(args[1]);
                     assignment.buildingID = Integer.parseInt(args[2]);
@@ -319,8 +349,7 @@ public class DormManagement {
                 } 
                 //if(!database.roomsFull(roomID)) and need to check to see if room and building match
                 else {
-                    database.insert("Assignment (studentID, buildingID, roomID)", 
-                        assignment.studentID + ", " + assignment.buildingID + ", " + assignment.roomID);
+                    dormManager.addAssignement(assignment, database);
                 }
             }
 
@@ -394,9 +423,10 @@ public class DormManagement {
                 }
             }
         } 
-        else if (actionPage.equals("viewAllBuildings")) {
-            dormManager.viewAllBuildings(database);
-        } else if (actionPage.equals("viewReport")) {
+        else if (actionPage.equals("viewAllRooms")) {
+            dormManager.viewAllRooms(database);
+        } 
+        else if (actionPage.equals("viewReport")) {
             dormManager.viewReport(database);
         }
         database.disConnect();
